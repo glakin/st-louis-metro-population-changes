@@ -1,0 +1,41 @@
+---
+title: "St. Louis Metro Population Changes - 2010-2020"
+author: "Jerry Lakin"
+date: "9/19/2021"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Loading 2020 Census Data
+
+We first load the census data from our .csv file. This file contains county-level
+data including 2010 population, 2020 population and the latitude and longitude
+of each county. R interprets the population numbers as strings. We convert them 
+to numeric format in a new column, taking care to remove comma separators. 
+
+```{r load, echo=TRUE}
+df <- read.csv('stl_metro_2020_population.csv')
+
+df$pop2010 <- as.numeric(gsub(",", "", df$X2010))
+df$pop2020 <- as.numeric(gsub(",", "", df$X2020))
+df$popChange <- df$pop2020 - df$pop2010
+df$hover <- with(df, paste(County, "<br>", "Population change:", popChange))
+
+```
+
+## Plot the data using Plotly
+
+
+```{r pop_plot, fig.align='center', echo=FALSE, warning=FALSE, message=FALSE}
+
+library(plotly)
+plot_ly(df, x = ~pop2010, y = ~pop2020, mode = "markers", color = ~popChange, 
+               colors = "RdBu", text = ~hover) %>% 
+  layout(title = "St. Louis Metropolitan Area Population Changes - 2010-2020",
+         xaxis = list(title = "2010 Population"), yaxis = list(title = "2020 Population"))
+
+```
+
